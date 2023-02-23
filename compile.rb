@@ -7,7 +7,7 @@ module BeetBasic
       @st = {}
     end
 
-    def parse_node(node)
+    def compile(node)
       case node
       in BeetBasic::Number => n
         puts "Compiling a number"
@@ -15,6 +15,8 @@ module BeetBasic
         puts "Compiling a variable"
       in BeetBasic::Add => a
         puts "Compiling an addition"
+        compile a.left
+        compile a.right
       in BeetBasic::Sub => s
         puts "Compiling a subtraction"
       in BeetBasic::Mul => m

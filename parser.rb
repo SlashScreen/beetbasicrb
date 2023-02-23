@@ -14,7 +14,7 @@ module BeetBasic
             #Parse expressions in parenthesis as an expression
             clause("LPAREN expr RPAREN") {|_, e, _| e}
             #Parse literals
-            clause("NUMBER") {|n| Number.new(n)}
+            clause("NUM") {|n| Number.new(n)}
             clause("IDENT") {|i| Variable.new(i)}
             #Parse binary operations
             clause("expr ADD expr") {|e0, _, e1| Add.new(e0, e1)}

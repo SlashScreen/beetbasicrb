@@ -1,3 +1,4 @@
+# typed: false
 require 'rltk/lexer'
 
 module BeetBasic

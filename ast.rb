@@ -1,3 +1,4 @@
+# typed: strict
 require 'rltk/ast'
 
 module BeetBasic

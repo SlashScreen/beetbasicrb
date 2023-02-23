@@ -3,16 +3,18 @@ require 'rltk/ast'
 
 module BeetBasic
     #Expressions
-    class Expression < RLTK::ASTNode; end
+    class Expression < RLTK::ASTNode
+    end
 
     class Number < Expression
         value :value, Integer #* value is a method that takes a symbol and a type.
+        #cmp {@value.to_s}
     end
-    
+
     class Variable < Expression
         value :name, String
     end
-    
+
     #Binops
     class Binary < Expression
         child :left, Expression #* child is a method that takes a symbol and a type. The lack of parenthesis is kiling me.
@@ -33,13 +35,13 @@ module BeetBasic
         value :name, String
         child :args, [Expression] # takes in an array of expressions
     end
-    
+
     #Function signature
     class Prototype < RLTK::ASTNode
         value :name, String
         value :arg_names, [String]
     end
-    
+
     class Function < RLTK::ASTNode
         child :proto, Prototype
         child :body, Expression

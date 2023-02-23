@@ -3,7 +3,7 @@ require 'rltk/ast'
 module BeetBasic
     #Expressions
     class Expression < RLTK::ASTNode; end
-    
+
     class Number < Expression
         value :value, Integer #* value is a method that takes a symbol and a type.
     end
@@ -17,7 +17,7 @@ module BeetBasic
         child :left, Expression #* child is a method that takes a symbol and a type. The lack of parenthesis is kiling me.
         child :right, Expression
     end
-    
+
     class Add < Binary; end
     class Sub < Binary; end
     class Mul < Binary; end
@@ -26,7 +26,7 @@ module BeetBasic
     class GT < Binary; end
     class LTE < Binary; end
     class GTE < Binary; end
-    
+
     #Function call
     class Call < Expression
         value :name, String

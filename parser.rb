@@ -54,7 +54,7 @@ module BeetBasic
             clause("IDENT") { |i| [i] }
             clause("IDENT COMMA arg_def_list") { |i, _, a| [i] + a } #recursive
         end
-    
+
         finalize({:use => 'bbparser.tbl'})
     end
 end

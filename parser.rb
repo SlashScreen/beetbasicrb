@@ -6,7 +6,7 @@ module BeetBasic
 
         production(:statement) do
             clause("expr") {|e| e}
-            clause("proto") {|p| p}
+            clause("proto") {|pr| pr}
             clause("fn") {|f| f}
         end
 
@@ -41,8 +41,8 @@ module BeetBasic
             clause("expr COMMA arg_list") { |e, _, a| [e] + a } #recursive
         end
         #Functions
-        production(:proto, "FN p_body") { |_, p| p }
-        production(:fn, "proto expr") { |p, e| Function.new(p, e) }
+        production(:proto, "FN p_body") { |_, pr| pr }
+        production(:fn, "proto expr") { |pr, e| Function.new(pr, e) }
         production(:p_body, "IDENT LPAREN arg_defs RPAREN") { |name, _, arg_names, _| Prototype.new(name, arg_names) }
 
         production(:arg_defs) do

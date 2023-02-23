@@ -10,6 +10,12 @@ class BeetBasic < KPeg::CompiledParser
 
   module AST
     class Node; end
+    class Block < Node
+      def initialize(body)
+        @body = body
+      end
+      attr_reader :body
+    end
     class Branch < Node
       def initialize(expr)
         @expr = expr
@@ -18,6 +24,9 @@ class BeetBasic < KPeg::CompiledParser
     end
   end
   module ASTConstruction
+    def block(body)
+      AST::Block.new(body)
+    end
     def branch(expr)
       AST::Branch.new(expr)
     end
@@ -122,17 +131,24 @@ class BeetBasic < KPeg::CompiledParser
     return _tmp
   end
 
-  # STMT = ident newline
+  # STMT = ident:i newline {i}
   def _STMT
 
     _save = self.pos
     while true # sequence
       _tmp = apply(:_ident)
+      i = @result
       unless _tmp
         self.pos = _save
         break
       end
       _tmp = apply(:_newline)
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; i; end
+      _tmp = true
       unless _tmp
         self.pos = _save
       end
@@ -150,7 +166,7 @@ class BeetBasic < KPeg::CompiledParser
     return _tmp
   end
 
-  # BLOCK = (space | indent)* (IF | STMT+)?
+  # BLOCK = (space | indent)* (IF:b {block(b)} | STMT+:b {block(b)})?
   def _BLOCK
 
     _save = self.pos
@@ -179,20 +195,56 @@ class BeetBasic < KPeg::CompiledParser
 
       _save4 = self.pos
       while true # choice
-        _tmp = apply(:_IF)
+
+        _save5 = self.pos
+        while true # sequence
+          _tmp = apply(:_IF)
+          b = @result
+          unless _tmp
+            self.pos = _save5
+            break
+          end
+          @result = begin; block(b); end
+          _tmp = true
+          unless _tmp
+            self.pos = _save5
+          end
+          break
+        end # end sequence
+
         break if _tmp
         self.pos = _save4
-        _save5 = self.pos
-        _tmp = apply(:_STMT)
-        if _tmp
-          while true
-            _tmp = apply(:_STMT)
-            break unless _tmp
+
+        _save6 = self.pos
+        while true # sequence
+          _save7 = self.pos
+          _ary = []
+          _tmp = apply(:_STMT)
+          if _tmp
+            _ary << @result
+            while true
+              _tmp = apply(:_STMT)
+              _ary << @result if _tmp
+              break unless _tmp
+            end
+            _tmp = true
+            @result = _ary
+          else
+            self.pos = _save7
           end
+          b = @result
+          unless _tmp
+            self.pos = _save6
+            break
+          end
+          @result = begin; block(b); end
           _tmp = true
-        else
-          self.pos = _save5
-        end
+          unless _tmp
+            self.pos = _save6
+          end
+          break
+        end # end sequence
+
         break if _tmp
         self.pos = _save4
         break
@@ -281,9 +333,39 @@ class BeetBasic < KPeg::CompiledParser
     return _tmp
   end
 
-  # root = BLOCK
+  # root = STMT+:b {@ast = b}
   def _root
-    _tmp = apply(:_BLOCK)
+
+    _save = self.pos
+    while true # sequence
+      _save1 = self.pos
+      _ary = []
+      _tmp = apply(:_STMT)
+      if _tmp
+        _ary << @result
+        while true
+          _tmp = apply(:_STMT)
+          _ary << @result if _tmp
+          break unless _tmp
+        end
+        _tmp = true
+        @result = _ary
+      else
+        self.pos = _save1
+      end
+      b = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; @ast = b; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
     set_failed_rule :_root unless _tmp
     return _tmp
   end
@@ -300,10 +382,10 @@ class BeetBasic < KPeg::CompiledParser
   Rules[:_kw_if] = rule_info("kw_if", "\"if\"")
   Rules[:_kw_end] = rule_info("kw_end", "\"end\"")
   Rules[:_kw_fn] = rule_info("kw_fn", "\"fn\"")
-  Rules[:_STMT] = rule_info("STMT", "ident newline")
+  Rules[:_STMT] = rule_info("STMT", "ident:i newline {i}")
   Rules[:_EXPR] = rule_info("EXPR", "ident")
-  Rules[:_BLOCK] = rule_info("BLOCK", "(space | indent)* (IF | STMT+)?")
+  Rules[:_BLOCK] = rule_info("BLOCK", "(space | indent)* (IF:b {block(b)} | STMT+:b {block(b)})?")
   Rules[:_IF] = rule_info("IF", "kw_if space* EXPR:e space* newline BLOCK*:body kw_end {branch(e)}")
-  Rules[:_root] = rule_info("root", "BLOCK")
+  Rules[:_root] = rule_info("root", "STMT+:b {@ast = b}")
   # :startdoc:
 end

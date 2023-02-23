@@ -4,6 +4,7 @@
     attr_reader :ast
 }
 
+%% block = ast Block(body)
 %% branch = ast Branch(expr)
 
 period = "."
@@ -21,13 +22,13 @@ kw_end = "end"
 kw_fn = "fn"
 
 #statements
-STMT = (ident newline)
+STMT = (ident:i newline) {i}
 
 #expressions
-EXPR = (ident)
+EXPR = ident
 
 #blocks
-BLOCK = (space|indent)* (IF | STMT+)?
+BLOCK = (space|indent)* (IF:b ~block(b) | STMT+:b ~block(b))?
 IF = kw_if space* EXPR:e space* newline BLOCK*:body kw_end ~branch(e)
 
-root = BLOCK
+root = STMT+:b {@ast = b}

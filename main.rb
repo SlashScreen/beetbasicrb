@@ -1,3 +1,5 @@
+require 'pp'
+
 $LOAD_PATH << '.'
 
 require "beetbasic.kpeg.rb"
@@ -9,4 +11,4 @@ end
 ")
 
 puts parser.parse
-puts parser.ast
+PP.pp parser.ast, $>, 79

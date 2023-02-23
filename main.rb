@@ -25,7 +25,7 @@ loop do
         when BeetBasic::Prototype then puts "parsed a prototype"
         when BeetBasic::Function then puts "parsed a function"
         end
-        compiler.compile(ast)
+        puts compiler.compile(ast)
     rescue RLTK::NotInLanguage
         puts "Not in language"
     end

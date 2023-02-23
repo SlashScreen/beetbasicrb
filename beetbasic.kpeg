@@ -1,0 +1,33 @@
+%% name = BeetBasic
+
+%% {
+    attr_reader :ast
+}
+
+%% branch = ast Branch(expr)
+
+period = "."
+space = " "
+indent = "    " | "\t"
+newline = /(\r\n|\r|\n)/
+bang = "!"
+ALPHA = /[A-Za-z]/
+DIGIT = /[0-9]/
+ident = ALPHA+
+
+#keywords
+kw_if = "if"
+kw_end = "end"
+kw_fn = "fn"
+
+#statements
+STMT = (ident newline)
+
+#expressions
+EXPR = (ident)
+
+#blocks
+BLOCK = (space|indent)* (IF | STMT+)?
+IF = kw_if space* EXPR:e space* newline BLOCK*:body kw_end ~branch(e)
+
+root = BLOCK

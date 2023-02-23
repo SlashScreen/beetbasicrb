@@ -1,0 +1,11 @@
+var foo = 10
+
+fn bar (x)
+    print(x)
+end
+
+fn print(string)
+    asm!{
+
+    }
+end

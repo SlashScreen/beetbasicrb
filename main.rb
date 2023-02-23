@@ -3,11 +3,14 @@ $LOAD_PATH << '.'
 require "lexer"
 require "parser"
 require "ast"
+require "compile"
 
 def prompt(p)
     print p
     gets.chomp
 end
+
+compiler = BeetBasic::Compiler.new
 
 loop do
     line = prompt('BeetBasic ==> ')
@@ -21,6 +24,7 @@ loop do
         when BeetBasic::Prototype then puts "parsed a prototype"
         when BeetBasic::Function then puts "parsed a function"
         end
+        compiler.parse_node(ast)
     rescue RLTK::NotInLanguage
         puts "Not in language"
     end

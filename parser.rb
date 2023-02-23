@@ -3,13 +3,13 @@ require 'rltk/parser'
 module BeetBasic
     class Parser < RLTK::Parser
         production(:input, 'statement SEMI') { |s, _| s }
-    
+
         production(:statement) do
             clause("expr") {|e| e}
             clause("proto") {|p| p}
             clause("fn") {|f| f}
         end
-    
+
         production(:expr) do
             #Parse expressions in parenthesis as an expression
             clause("LPAREN expr RPAREN") {|_, e, _| e}
@@ -28,28 +28,28 @@ module BeetBasic
             clause("expr GTE expr") {|e0, _, e1| GTE.new(e0, e1)}
             #Function call
             clause("IDENT LPAREN args RPAREN") {|i, _, args, _| Call.new(i, args)}
-    
+
         end
         #Arguments
         production(:args) do
             clause("") { [] } #no arguments
             clause("arg_list") { |a| a }
         end
-    
+
         production(:arg_list) do
             clause("expr") { |e| [e] }
             clause("expr COMMA arg_list") { |e, _, a| [e] + a } #recursive
         end
         #Functions
         production(:proto, "FN p_body") { |_, p| p }
-        production(:fn, "proto EXPR") { |p, e| Function.new(p, e) }
+        production(:fn, "proto expr") { |p, e| Function.new(p, e) }
         production(:p_body, "IDENT LPAREN arg_defs RPAREN") { |name, _, arg_names, _| Prototype.new(name, arg_names) }
-    
+
         production(:arg_defs) do
             clause("") { [] } #no arguments
             clause("arg_def_list") { |a| a }
         end
-    
+
         production(:arg_def_list) do
             clause("IDENT") { |i| [i] }
             clause("IDENT COMMA arg_def_list") { |i, _, a| [i] + a } #recursive

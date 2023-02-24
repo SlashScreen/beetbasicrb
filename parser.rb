@@ -3,6 +3,8 @@ require 'rltk/parser'
 
 module BeetBasic
     class Parser < RLTK::Parser
+        left   :ADD, :SUB, :LTE, :GTE
+        right  :LT, :GT, :MUL, :DIV
         production(:input, 'statement SEMI') { |s, _| s }
 
         production(:statement) do
@@ -56,6 +58,6 @@ module BeetBasic
             clause("IDENT COMMA arg_def_list") { |i, _, a| [i] + a } #recursive
         end
 
-        finalize({:use => 'bbparser.tbl'})
+        finalize#({:use => 'bbparser.tbl'})
     end
 end

@@ -4,15 +4,24 @@ require 'rltk/ast'
 module BeetBasic
     #Expressions
     class Expression < RLTK::ASTNode
+        def compile
+            "TODO"
+        end
     end
 
     class Number < Expression
         value :value, Integer #* value is a method that takes a symbol and a type.
+        def compile
+            "##{value}"
+        end
         #cmp {@value.to_s}
     end
 
     class Variable < Expression
         value :name, String
+        def compile
+            "#{name}; LDA"
+        end
     end
 
     #Binops
@@ -21,19 +30,72 @@ module BeetBasic
         child :right, Expression
     end
 
-    class Add < Binary; end
-    class Sub < Binary; end
-    class Mul < Binary; end
-    class Div < Binary; end
-    class LT < Binary; end
-    class GT < Binary; end
-    class LTE < Binary; end
-    class GTE < Binary; end
+    class Add < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} ADD"
+        end
+    end
+    class Sub < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} SUB"
+        end
+    end
+    class Mul < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} MUL"
+        end
+    end
+    class Div < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} DIV"
+        end
+    end
+    class LT < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} LTH"
+        end
+    end
+    class GT < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} GTH"
+        end
+    end
+
+    class LTE < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} LTH #{lhs} #{rhs} EQU ORA"
+        end
+    end
+    class GTE < Binary
+        def compile
+            lhs = @left.compile
+            rhs = @right.compile
+            "#{lhs} #{rhs} GTH #{lhs} #{rhs} EQU ORA"
+        end
+    end
 
     #Function call
     class Call < Expression
         value :name, String
         child :args, [Expression] # takes in an array of expressions
+        def compile
+            fn_args = @args.map { |arg| arg.compile }.join(" ")
+            "#{args} @#{name} JSR2"
+        end
     end
 
     #Function signature

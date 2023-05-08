@@ -5,16 +5,16 @@ module BeetBasic
     #Expressions
     class Expression < RLTK::ASTNode
         def compile
-            "TODO"
+            "( Blank expression )"
         end
     end
 
     class Number < Expression
         value :value, Integer #* value is a method that takes a symbol and a type.
+        #cmp {@value.to_s}
         def compile
             "##{value}"
         end
-        #cmp {@value.to_s}
     end
 
     class Variable < Expression
@@ -88,6 +88,44 @@ module BeetBasic
         end
     end
 
+    #Branch
+    class If < Expression
+        child :cond, Expression
+        child :th, Expression
+        child :el, Expression
+        def compile
+            cond = @cond.compile
+            if @el.nil?
+                thc = @th.compile #hehe thc
+                puts "#{th.class} #{thc}"
+                "#{cond} branch_true, JCN branch_false, JMP &branch_true #{thc} &branch_false"
+            else
+                thc = @th.compile
+                elc = @el.compile
+                puts "#{th.class} #{thc}"
+                puts "#{el.class} #{elc}"
+                "#{cond} branch_true, JCN #{elc} &branch_true #{thc}"
+            end
+        end
+    end
+
+    #for loop
+    class For < Expression
+        value :var, String
+        child :init, Expression
+        child :cond, Expression
+        child :step, Expression
+        child :body, Expression
+
+        def compile
+            init = @init.compile
+            cond = @cond.compile
+            step = @step.compile
+            body = @body.compile
+            "#{init} #{cond} &loop #{body} #{step} NEQ loop, JMP2r"
+        end
+    end
+
     #Function call
     class Call < Expression
         value :name, String
@@ -102,10 +140,16 @@ module BeetBasic
     class Prototype < RLTK::ASTNode
         value :name, String
         value :arg_names, [String]
+        def compile
+            "@#{name}"
+        end
     end
 
     class Function < RLTK::ASTNode
         child :proto, Prototype
         child :body, Expression
+        def compile
+            "#{proto.compile} #{body.compile} JMP2r"
+        end
     end
 end

@@ -6,8 +6,10 @@ module BeetBasic
         rule(/\s/) #Discard spaces
         #Keywords
         rule(/if/) { :IF }
+        rule(/then/) { :THEN }
         rule(/var/) { :VAR }
         rule(/else/) { :ELSE }
+        rule(/for/) { :FOR }
         rule(/end/) { :END }
         rule(/fn/) { :FN }
         rule(/while/) { :WHILE }

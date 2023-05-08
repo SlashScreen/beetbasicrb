@@ -3,8 +3,10 @@ require 'rltk/parser'
 
 module BeetBasic
     class Parser < RLTK::Parser
-        left   :ADD, :SUB, :LTE, :GTE
-        right  :LT, :GT, :MUL, :DIV
+        left :LTE, :GTE, :LT, :GT, :ELSE
+        left   :ADD, :SUB
+        right
+        right  :MUL, :DIV
         production(:input, 'statement SEMI') { |s, _| s }
 
         production(:statement) do
@@ -16,9 +18,6 @@ module BeetBasic
         production(:expr) do
             #Parse expressions in parenthesis as an expression
             clause("LPAREN expr RPAREN") {|_, e, _| e}
-            #Parse literals
-            clause("NUM") {|n| Number.new(n)}
-            clause("IDENT") {|i| Variable.new(i)}
             #Parse binary operations
             clause("expr ADD expr") {|e0, _, e1| Add.new(e0, e1)}
             clause("expr SUB expr") {|e0, _, e1| Sub.new(e0, e1)}
@@ -29,8 +28,16 @@ module BeetBasic
             clause("expr GT expr") {|e0, _, e1| GT.new(e0, e1)}
             clause("expr LTE expr") {|e0, _, e1| LTE.new(e0, e1)}
             clause("expr GTE expr") {|e0, _, e1| GTE.new(e0, e1)}
+            #Parse literals
+            clause("NUM") {|n| Number.new(n)}
+            clause("IDENT") {|i| Variable.new(i)}
             #Function call
             clause("IDENT LPAREN args RPAREN") {|i, _, args, _| Call.new(i, args)}
+            #If
+            clause("IF expr THEN expr") {|_, e0, _, e1| If.new(e0, e1, nil)}
+            clause("IF expr THEN expr ELSE expr") {|_, e0, _, e1, _ , e3| If.new(e0, e1, e3)}
+            #loop
+            clause("FOR IDENT ASSIGN expr COMMA expr IN expr") {|_, i, _, e0, _, e1, _, e2| For.new(i, e0, e1, e2)}
 
         end
         #Arguments
